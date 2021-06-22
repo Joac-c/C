@@ -1,0 +1,73 @@
+Compilación:
+
+gcc lista.c lista_pruebas.c -std=c99 -g -O0 -Wall -Wconversion -Werror -o lista
+
+Ejecución:
+
+valgrind --leak-check=full --track-origins=yes --show-reachable=yes ./lista
+
+
+
+
+Implementacion utilizada:
+
+Implemente el tda lista_enlazada a partir de dos estructuras basicas: nodo_t y lista_t.
+La primera contiene un puntero (elemento) que apunta hacia la informacion que buscamos almacenar
+y otro puntero (siguiente) que apunta hacia otro nodo generando asi una cadena de nodos recursivamente
+hasta el ultimo que apunta a NULL.
+La segunda contiene un puntero (nodo_inicio) dirigido primer nodo de la cadena, otro(nodo_final) dirigido 
+al ultimo nodo de la cadena y un integer (cantidad) donde se almacena la cantidad de nodos en la lista.
+
+Las funciones operan creando punteros a nodos, liberando la memoria que los contiene o (esto es muy importante)
+interactuando con el puntero (siguiente), ya sea para recorrer la lista o para reasignar dicho puntero
+a otro nodo alterando la estructura de la lista. Siempre que necesito recorrer la lista utilizo un puntero-a-nodo auxiliar e 
+itero sobre la lista cambiando el nodo al que apunta. Para borrar(en el medio o el final) o incertar(en el medio)(Para es utilizo
+una funcion aparte "incertar_entre_nodos()") recorro la lista hasta el nodo inmediatamente anterior a la ubicacion de interes y desde ahi opero sobre los nodos. Para
+incertar al(principio o al final) y borrar(al principio) no es necesario porque todos los nodos involucrados son accesibles 
+inmediatamente desde la lista. Borrar al principioo en el medio requiere de un puntero-a-nodo auxiliar que me indique donde se 
+encuentra el nodo una vez extraido de la lista para liberar su memoria
+
+Para destruir la lista(liberar su memoria), utilice una funcion "eliminar_nodos_recursivos(nodo_t* nodo)" que recibe 
+el nodo_inicio y libera recursivamente cada nodo hasta llegar al puntero NULL.
+ 
+
+Para las pruebas cree una funcion, verificar(bool afirmacion, const char* texto) que recibe un booleano generado comparando la salida de una funcion con cierto valor y un texto que describe la prueba a realizarse.
+De pasarse la prueba el texto se imprime antecedido con un tick, en caso contrario se imprime con una cruz. En algunas pruebas donde se repite muchas veces
+la misma funcion elegi utilizar contadores(sumando cada vez que dicha funcion es exitosa) y luego verificar si estos eran iguales a el valor esperado.  
+
+
+• ¿Qué es lo que entendés por una lista? ¿Cuáles son las diferencias entre ser simple o doblemente enlazada?
+
+Una lista es un tipo de dato abstracto en donde se almacenan elementos ordenados en una dimension, esto es, sucesivamente. En la lista enlazada
+cada elemento esta referenciado a un nodo independiente del conjunto. En caso de ser simplemente enlazada cada nodo esta 
+vinculado al siguiente, pudiendo acceder a todos los nodos a partir del anterior. En las listas doblemente enlazadas tambien es cierto lo contrario, 
+pudiendo accederse desde cualquier nodo al inmediatamente anterior. La principal utilidad de la lista enlazada es cada nodo puede encontrarse
+en ubicaciones del heap no-adyasentes, evitandonos tener que copiar toda la lista cada vez que necesitamos ampliar su capacidad maxima(no tienen 
+C.M. mas haya de la memoria disponible en el equipo) o reasignar la ubicacion los elementos siguientes al borrar o incertar, todas operaciones
+que implicarian recorrer la lista si esta fuera un arreglo comun. 
+
+
+• ¿Cuáles son las características fundamentales de las Pilas? ¿Y de las Colas?
+
+Las Pilas y Colas son un tipo particular de lista, diferenciadas por las operaciones que se pueden hacer con ellas, independientemente
+de su estructura interna. Ambas son inaccesibles en su interior y solo puede incertarseles elementos al final. En las pilas
+se tiene acceso para ver o borrar elementos al final de la lista (sale primero el ultimo en entrar). En las colas es alreves, 
+podemos ver y borrar exclusivamente el elemento al principio de la lista (sale primero el primero en entrar).  
+
+
+• ¿Qué es un iterador? ¿Cuál es su función?
+Un iterador, como su nombre lo indica, es un dispositivo que nos permite "iterar" sobre un conjunto de datos, 
+esto quiere decir recorrer sus elementos(accediendo a los mismos) secuencialmente, siguiendo un orden determinado.
+Gracias al iterador es posible interactuar con el tda en cuestion sin necesidad de acceder a su estructura interna. 
+
+El iterado de una lista la recorre en una direccion (la unica posible) y generalmente tambien lo hace en un unico sentido,
+desde el principio hasta donde lo indique el usuario.
+
+• ¿En qué se diferencia un iterador interno de uno externo?
+El iterador interno es una funcion del tda (en este caso la lista) que al ejecutarse lo recorre desde el inicio
+aplicando para cada elemento una funcion brindada como parametro, hasta cumplir con determinada condicion. En cambio
+el iterador externo se trata de un TDA independiente y como tal almacena datos y posee operaciones propias. Los datos
+en cuestion son una referencia a la lista generadora y otra que apunta a un elemento(o su contenedor en el caso de los nodos)
+el cual suele llamarse coorriente o actual y al crearse el iterador se trata del primero en la lista. 
+Una vez creado por su funcion respectiva, con las operaciones del iterador podemos  acceder a la informacion de dicho elemento, 
+averiguar si es el ultimo de la lista o avanzar, cambiando el elemento actual del iterador por el que le sucede.  

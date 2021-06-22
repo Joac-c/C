@@ -1,0 +1,7 @@
+Linea de compilacion juegoo.c:  cc juego.c lista/lista.c abb/abb.c heap/heap.c simulador.c -std=c99 -g -O0 -Wall -Wconversion -Werror -o juego
+
+
+Aclaraciones: Decidi comenzar desde la creacion de todas las estructuras pertinentes al juego
+
+
+valgrind --leak-check=full --track-origins=yes --show-reachable=yes -o inter

@@ -1,0 +1,184 @@
+Explicaciones de cosas del tp
+
+1)
+
+El trabajo esta compuesto de dos archivos, evento_de_pesca.c (hipoteticamente creado por el "programador") donde se encuentran las funciones que crean y 
+administran el arrecife, los pokemones y el acuario, y simulador.c(hipoteticamente creado por el usuario) donde utilizamos dichas funciones para
+simular traslados entre el arrecife y el acuario segun diversos criterios de seleccion.
+
+funciones de evento_ pesca.c en orden de uso:
+-crear_arrecife(ruta): El arrecife se crea con esta funcion que recibe la ruta del archivo de texto donde se encuentran listados los pokemones.
+primero abre el archivo y asigno la memoria dinamica para el arrecife. Luego llama a la funcion cargar_pokemones que recibe el archivo y carga los pokemones
+alli listados en el arrecife hasta que no pueda leer mas. 
+-crear_acuario(): Esta vez simplemente crea una estructura acuario_t e inicializa sus atributos
+-trasladar_pokemon(): Primero analiza el arrecife y verifica cuales pokemones siguen el criterio dictado por la funcion booleana que recibe como parametro.
+Para eso utiliza la funcion analizar_arrecife la cual devuelve una estructura auxiliar con los indices de tales pokemones almacenados. Luego de verificar 
+que la cantidad de trasladables es mayor o igual a los requeridos, utiliza la funcion mover_pokemones. Esta le asigna al acuario el tamaño correspondiente
+y recorre el arrecife y la estructura auxiliar para mover los pokemones al acuario.
+-censar_acuario() y censar_arrecife(): Ambas funcionan igual. Recorren el los arreglos de punteros a pokemones en las respectivas estructuras y utilizan una
+funcion que reciben como parametro para presentar en pantalla a cada pokemon.
+-guardar_datos_acuario(): Recorre el arreglo de punteros a pokemones en el acuario y copia los atributos de cada uno en un archivo de texto.
+-liberar_arrecife() y liberar_acuario(): Liberan la memoria asignada de los respectivos arreglos de pokemones y luego de cada estructura.
+
+funciones de simulador:
+/Para seleccionar:
+-suma_nombre_par. Devuelve true si la suma de los valores assci de los caracteres en el nombre del pokemon es par
+-tiene_rojo. Devuelve true si el pokemon tiene algo de color rojo
+-pokemon_lento. Devuelve true si el pokemon es mas lento que 9
+-nombre_bombastico. Devuelve true si el pokemon tiene una especie con muchas vocales. En un evento quedan mas epicos esos nombres.
+-rapido_para_su_tamano. Devuelve true si el pokemon es rapido a pesar de tener un peso relativamente alto
+
+/Para mostrar (mostrar_pokemon + numero)
+1Simplemente imprime los datos del pokemon en una linea separados por ;
+2Imprime los datos del pokemon antecedidos por el nombre de cada uno
+3Imprime la especie del pokemon y el rasgo mas caracteristico entre peso y velocidad
+4Imprime la especie y su color. Porque el look es lo primero.
+5Imprime todos los atributos del pokemon en lineas distintas. Serio y prolijo.
+
+/El Main:
+Controla el flujo del simulador. Crea un arrecife y un acuario. Luego traslada los pokemones del primero al segundo utilizando cada
+funcion de seleccion y mostrando los resultados en pantalla con cada funcion de muestra. Por ultimo libera el espacio del arrecife y el acuario. 
+
+
+
+
+2)  
+
+Para compilar el trabajo la linea es:
+cc simulador.c evento_pesca.c -std=c99 -g -O0 -Wall -Wconversion -Werror -o evento_pesca
+                               
+para ejecutar el trabajo la linea es:
+valgrind --leak-check=full --track-origins=yes --show-reachable=yes ./evento_pesca arrecife.txt acuario.txt
+
+3)
+1.Punteros. Un puntero es una variable que almacena la direccion de memoria de otra variable. Utilizando punteros es
+  posible acceder a la memoria dinamica la cual se administra durante el tiempo de ejecucion.
+
+2. Aritmética de punteros. Es el conjunto de operaciones que pueden hacerse sobre los punteros y las variables en relacion
+    a las direcciones de memoria. los operandos principales son * y &. Con *puntero accedemos al contenido almacenado en la variable
+    a la que apunta el puntero. Con & accedemos a la direccion de memoria de una variable. Tambien podemos usar ++ o -- sobre un puntero para
+    que apunte a una direccion de memoria adyasente, a distancia igual al tamaño del tipo de dato del puntero. Por esto ultimo a los punteros genericos
+    de tipo Void* no se les puede aplicar la aritmetica de punteros.    
+3. Punteros a funciones. Almacenan la direccion de memoria de una funcion y permiten pasarla como parametro a otra funcion.
+   Se inicializan con: Void* nombre_puntero(tipo_dato_parametro) = &nombre_funcion 
+4. Malloc y Realloc. Como decia antes los punteros pueden apuntar a la memoria dinamica. La funcion Malloc recibe una cantidad de bytes y devuelve una 
+   direccion del Heap(memoria dinamica) con esa cantidad de bytes sucesivos disponibles. Con dicha direccion(como cualquier otra) podemos inicializar un puntero
+   La funcion Realloc recibe un puntero y un numero de bytes. Devuelve una direccion del Heap con dichos bytes sucesivos y el contenido al que apunta el puntero
+   copiados en su interior. La cantidad de bytes que reciben Malloc y Realloc pueden definirse en tiempo de ejecucion (ser variables) pero tambien debe ser liberada
+   por el programa o queda inutilizable.
+
+
+
+
+
+3. Enunciado
+
+La líder de gimnasio Misty organizó un evento de pesca que se llevará a cabo en su acuario, ubicado en Ciudad Celeste.
+Para ello necesitará muchos y muy variados pokémon de tipo agua. El lugar indicado en Kanto para obtener a todos
+estos pokémon es el arrecife que rodea a las Islas Espuma.
+Para realizarlo, te pide que la ayudes a trasladar los pokémon seleccionados desde el arrecife a su acuario, donde será
+realizado el evento.
+A Misty le preocupa perjudicar la población de las especies más vulnerables, es por ello que te pide realizar una simulación
+del arrecife, pudiendo ver como quedará su estado dependiendo de qué especies se elijan para el evento.
+Las funcionalidades que se deben implementar se detallan a continuación:
+
+/*
+* Función que dado un archivo carga los pokémon que viven en el arrecife
+* reservando la memoria necesaria para el mismo. Se debe intentar leer la mayor
+* cantidad posible de registros del archivo. Al encontrar el primer registro
+* erróneo (o al llegar al final del archivo) se deben finalizar la lectura y
+* crear el arrecife con los pokémon leídos exitosamente. En caso de no
+* encontrar ningún registro con el formato correcto , se debe devolver error.
+* Devuelve un puntero a un arrecife válido o NULL en caso de error.
+*/
+arrecife_t* crear_arrecife(char* ruta_archivo);
+
+/*
+* Función que crea un acuario vacío reservando la memoria necesaria para el mismo.
+* Devuelve el acuario o NULL en caso de error.
+*/
+acuario_t* crear_acuario ();
+
+
+/*
+Función que deberá sacar del arrecife a todos los pokémon que satisfagan la
+condición dada por el puntero a función (que devuelvan true) y trasladarlos
+hacia el acuario. El parámetro cant_seleccion especifica la cantidad máxima
+de pokémon que serán trasladados. En caso de que haya menos pokémon trasladables en el
+arrecife que los pedidos , no se deberá mover ninguno para conservar los pocos existentes.
+El vector de pokemones del arrecife quedará solo con aquellos que no fueron
+trasladados (su tamaño se ajustará luego de cada traslado).
+El vector de pokemones del acuarió quedará con aquellos que fueron
+trasladados esta vez más los que ya había en el
+acuario (su tamaño se ajustará luego de cada traslado).
+Devuelve -1 en caso de error o 0 en caso contrario.
+*/
+int trasladar_pokemon (arrecife_t* arrecife , acuario_t* acuario , bool (* seleccionar_pokemon )
+(pokemon_t *), int cant_seleccion);
+
+
+/*
+* Procedimiento que dado un arrecife deberá mostrar por pantalla a todos los pokemon que contiene.
+*/
+void censar_arrecife(arrecife_t* arrecife , void (* mostrar_pokemon)(pokemon_t *));
+
+
+
+/*
+* Función que dado un acuario guarda en un archivo de texto a los pokemones que contiene.
+* Devuelve 0 si se realizo con éxito o -1 si hubo algun problema para guardar el archivo.
+*/
+int guardar_datos_acuario (acuario_t* acuario , const char* nombre_archivo);
+
+
+/*
+* Libera la memoria que fue reservada para el acuario.
+*/
+void liberar_acuario(acuario_t* acuario);
+
+
+/*
+* Libera la memoria que fue reservada para el arrecife.
+*/
+void liberar_arrecife(arrecife_t* arrecife);
+
+
+A su vez, se cuenta con los siguientes registros a utilizar en el presente trabajo:
+
+typedef struct pokemon{
+char especie[MAX_ESPECIE ];
+int velocidad;
+int peso;
+char color[MAX_COLOR ];
+} pokemon_t;
+
+typedef struct acuario{
+pokemon_t* pokemon;
+int cantidad_pokemon;
+} acuario_t;
+
+typedef struct arrecife{
+pokemon_t* pokemon;
+int cantidad_pokemon;
+} arrecife_t;
+
+Los pokémon pertenecientes al arrecife se encontrarán en el archivo arrecife.txt cuya ruta llega como parámetro.
+El archivo tendrá la siguiente información:
+
+especie1;velocidad1;peso1;color1
+especie2;velocidad2;peso2;color2
+especie3;velocidad3;peso3;color3
+...
+Un ejemplo se muestra a continuación
+
+Magikarp ;9;10; rojo
+Goldeen ;23;15; blanquirrojo
+Feebas ;11;8; marron
+Luvdisc ;27;9; rosa
+...
+Los pokémon que estén registrados en el acuario de Misty serán guardados en un archivo acuario.txt con el siguiente
+formato:
+
+especie1;velocidad1;peso1;color1
+especie2;velocidad2;peso2;color2
+especie3;velocidad3;peso3;color3

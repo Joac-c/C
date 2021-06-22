@@ -1,0 +1,9 @@
+
+E;Ash
+P;Pikachu;42;30;18
+P;Butterfree;31;32;27
+P;Pidgeotto;40;30;20
+P;Bulbasaur;20;40;30
+P;Charmander;30;40;20
+P;Squirtle;28;22;40
+P;Krabby;31;35;24

@@ -1,0 +1,138 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+
+/*
+Implementar un algoritmo en C que reciba un arreglo de enteros de 
+tamaño n, ordenado ascendentemente y sin elementos repetidos, y 
+determine en O(log⁡n) si es mágico. Un 
+arreglo es mágico si existe algún valor i
+tal que 0 ≤ i< n y arr[i] = i. 
+Justificar el orden del algoritmo.
+
+Ejemplos:
+
+    A = [ -3, 0, 1, 3, 7, 9 ] es mágico porque A[3] = 3.
+
+    B = [ 1, 2, 4, 6, 7, 9 ] no es mágico porque B[i] != i
+    para todo i.
+
+
+*/
+
+
+
+bool buscar_magicos(int* arr, int n){
+    int i = 0;
+    int iters = 1;
+    bool es_magico = true;
+    while (es_magico)
+    {
+        if(i >= 0 && i < n && i == arr[i]) return es_magico;
+        else if(i >= 0 && i < n && i > arr[i]) i = i + n/(2*iters); 
+        else if(i >= 0 && i < n && i < arr[i]) i = i - n/(2*iters);
+        iters++;
+        printf("it\n");
+        if(n/(2*iters) < 1) return false;
+    }
+
+}
+
+
+// Este algoritmo no es divide y conquista porque en cada
+// llamado recursivo el arreglo con el que se trabaja
+// no se divide en partes sino que se reduce en una unidad
+
+int maximo(int* arreglo, size_t n) {
+    if (n == 1) {
+        return arreglo[0];
+    }
+    int max_restante = maximo(arreglo, n - 1);
+    return arreglo[n - 1] > max_restante ? arreglo[n - 1] : max_restante;
+}
+
+
+//Indicar la complejidad del siguiente algoritmo, utilizando el teorema maestro:
+bool elemento_esta(int* arreglo, size_t inicio, size_t fin, int elem) {
+    if (inicio > fin) return false;
+    size_t medio = (fin + inicio) / 2;
+    if (arreglo[medio] == elem) {
+        return true;
+    }
+    if (arreglo[medio] < elem) {
+        return elemento_esta(arreglo, medio + 1, fin, elem);
+    }
+
+    for (size_t i = medio - 1; i > inicio - 1; i--) {
+        if (arreglo[i] == elem) return true;
+    }
+    return false;
+}
+
+/*
+Teorema Maestro:  T(n) = AT(n/b) + f(n)
+
+Como F(n) es O(n) > Log(n) entonces 
+
+
+*/
+
+
+
+void imprimir_dyc(int m) {
+    if (m < 4) return;
+    printf("%d\n", m);
+    imprimir_dyc(m / 4);
+    imprimir_dyc(m - (m / 4));
+}
+
+
+/*
+Con M = 7
+1) m > 5 ---> Se imprime 7
+2) LLamado recursivo con M = 7/4 = 2 ---> m < 4 ---> No pasa nada
+3) LLamado recursivo con M = 7 - 7/4 = 6 ----> m > 5 ---> Se imprime 6 
+3.1) LLamado recursivo con M = 6/4 = 2 ---> m < 4 ---> No pasa nada
+3.2) LLamado recursivo con M = 6 - 6/4 = 5 ----> m > 5 ---> Se imprime 5
+3.2.1) LLamado recursivo con M = 5/4 = 1 ---> m < 4 ---> No pasa nada
+3.2.2) LLamado recursivo con M = 5 - 5/4 = 4 ----> m > 4 ---> Se imprime 4
+3.2.2.1) LLamado recursivo con M = 4/4 = 1 ---> m < 4 ---> No pasa nada
+3.2.2.2) LLamado recursivo con M = 4 - 4/4 = 3 ----> m > 3 ---> No pasa nada
+*/
+
+
+size_t buscar_pico(int* arr, size_t in, size_t fin){
+    size_t medio = (in + fin)/2;
+    printf("iter\n");
+    if(arr[medio -1] < arr[medio] && arr[medio + 1] < arr[medio]) return medio;
+    if(arr[medio -1] > arr[medio]) return buscar_pico(arr, in, medio - 1);
+    if(arr[medio + 1] > arr[medio]) return buscar_pico(arr, medio + 1, fin);
+    
+}
+
+/*
+Uso el teorema maestro para descubrir la complejidad
+A = 1 (En cada llamado recursivo solo se llama a la funcion una vez)
+B = 2 (Se divide en un arreglo con la mitad de tamaño)
+F(n) = O(1) (Cuatro operaciones de tiempo constante)
+
+
+*/
+
+
+
+
+
+int main(){
+    
+    int valores[] = {-5, -3, -2, 0, 2, 5, 7, 8, 9, 10, 4, 3, 2, 1, 0, -3};
+    if(buscar_magicos(valores, 15) == true) printf("ES MAGICO\n");
+    else printf("NO ES MAGICO\n");
+    maximo(valores, 11);
+    imprimir_dyc(7);
+    printf("La direccion del pico es %ld", buscar_pico(valores, 0, 15));
+    return 0;
+}
+
+
