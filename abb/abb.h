@@ -5,6 +5,8 @@
 #define ABB_RECORRER_PREORDEN  1
 #define ABB_RECORRER_POSTORDEN 2
 
+#include "pila.h"
+
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -23,19 +25,9 @@ typedef int (*abb_comparar_clave_t) (const char *, const char *);
 typedef void (*abb_destruir_dato_t) (void *);
 
 
-typedef struct nodo_abb {
-  void* elemento;
-  const char* clave;
-  struct nodo_abb* izquierda;
-  struct nodo_abb* derecha;
-} nodo_abb_t;
+typedef struct nodo_abb nodo_abb_t;
 
-typedef struct abb{
-  nodo_abb_t* nodo_raiz;
-  abb_comparar_clave_t comparador;
-  abb_destruir_dato_t destructor;
-  size_t cantidad;
-  } abb_t;
+typedef struct abb abb_t;
 
 /*
  * Crea el arbol y reserva la memoria necesaria de la estructura.
@@ -77,6 +69,29 @@ bool abb_pertenece(const abb_t *arbol, const char *clave);
 
 size_t abb_cantidad(const abb_t *arbol);
 
+/*
+ * Destruye el arbol liberando la memoria reservada por el mismo.
+ * Adicionalmente invoca el destructor con cada elemento presente en
+ * el arbol.
+ */
+void abb_destruir(abb_t* arbol);
+
+
+void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra);
+
+
+typedef struct abb_iter abb_iter_t;
+
+abb_iter_t *abb_iter_in_crear(const abb_t *arbol);
+bool abb_iter_in_avanzar(abb_iter_t *iter);
+const char *abb_iter_in_ver_actual(const abb_iter_t *iter);
+bool abb_iter_in_al_final(const abb_iter_t *iter);
+void abb_iter_in_destruir(abb_iter_t* iter);
+
+
+//ACA ABAJO LAS FUNCIONES QUE NO VAN
+
+
 
 /*
  * Devuelve el elemento almacenado como raiz o NULL si el árbol está
@@ -89,6 +104,7 @@ void* arbol_raiz(abb_t* arbol);
  * Devuelve true si está vacío o el arbol es NULL, false si el árbol tiene elementos.
  */
 bool arbol_vacio(abb_t* arbol);
+
 
 /*
  * Llena el array del tamaño dado con los elementos de arbol
@@ -125,7 +141,7 @@ size_t arbol_recorrido_postorden(abb_t* arbol, void** array, size_t tamanio_arra
  * Adicionalmente invoca el destructor con cada elemento presente en
  * el arbol.
  */
-void arbol_destruir(abb_t* arbol);
+void abb_destruir(abb_t* arbol);
 
 /*
  * Iterador interno. Recorre el arbol e invoca la funcion con cada
